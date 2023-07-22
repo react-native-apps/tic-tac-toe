@@ -26,8 +26,8 @@ const valueToIconMap: {[key: string]: customIconType} = {
   X: 'cross',
 };
 
-const firstDiagonal = new Set([0, 4, 8]);
-const secondDiagonal = new Set([2, 4, 6]);
+const firstDiagonal = [0, 4, 8];
+const secondDiagonal = [2, 4, 6];
 
 function App(): JSX.Element {
   // Initial Values
@@ -50,8 +50,11 @@ function App(): JSX.Element {
 
   // Handlers
   const onTurnHandler = (buttonInd: number): void => {
+    if (winner !== 'U') {
+      return Alert.alert('Game Ended! Please click on Start New Game');
+    }
     if (board[buttonInd] !== 'U') {
-      return;
+      return Alert.alert('This box is already selected');
     }
     board[buttonInd] = board[buttonInd] === 'O' ? 'X' : 'O';
 
@@ -65,13 +68,24 @@ function App(): JSX.Element {
     ) {
       doesWon = true;
     }
-    if (firstDiagonal.has(buttonInd) && !doesWon) {
-      if (
-        player === board[(buttonInd + 3) % 9] &&
-        player === board[(buttonInd + 6) % 9]
-      ) {
-        doesWon = true;
-      }
+    if (!doesWon && firstDiagonal.includes(buttonInd)) {
+      let count = 0;
+      firstDiagonal.forEach(ind => {
+        if (ind !== buttonInd && player === board[ind]) {
+          count++;
+        }
+      });
+      doesWon = count === 2;
+    }
+
+    if (!doesWon && secondDiagonal.includes(buttonInd)) {
+      let count = 0;
+      secondDiagonal.forEach(ind => {
+        if (ind !== buttonInd && player === board[ind]) {
+          count++;
+        }
+      });
+      doesWon = count === 2;
     }
 
     if (doesWon) {
